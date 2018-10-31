@@ -6,17 +6,38 @@
 using UnityEngine; // Fjern denne og nedarvningen, når koden er done
 
 public class Assignment : MonoBehaviour {
-
+    #region SHIT
     public int correctAnswers = 0;
 
     public void Create()
     {
-
+        switch(diff)
+        {
+            case Difficulty.INTRODUCTION:
+                break;
+            case Difficulty.EASY:
+                break;
+            case Difficulty.MEDIUM:
+                break;
+            case Difficulty.HARD:
+                break;
+            case Difficulty.INSANE:
+                break;
+        }
+        correctAnswer = Differentiate("3x");
     }
 
     public void Correct(string function)
     {
-
+        if (IsUserCorrect(function))
+        {
+            correctAnswers++;
+            correctAnswersInARow++;
+        }
+        else
+        {
+            correctAnswersInARow = 0;
+        }
     }
 
     public enum Difficulty
@@ -38,60 +59,64 @@ public class Assignment : MonoBehaviour {
     {
 
     }
-
-    private bool IsUserCorrect()
-    {
-        return false;
-    }
+    #endregion
+    private bool IsUserCorrect(string function) { return function == correctAnswer; }
 
     private string Differentiate(string function)
     {
-
-        string answer = "";
-
-        int[] order = new int[9];
+        int[] pos = new int[9];
         int count = 0;
 
+        // Søg efter bogstavet 'x' i funktionsforskriften og gem i pos-array
         for (int i = 0; i < function.Length; i++)
         {
             if (function[i] == 'x')
             {
-                order[count] = i;
+                pos[count] = i;
                 count++;
             }
         }
 
+        string answer = "";
+
+        // Loop igennem alle de fundne 'x'-er fundet i funktionsforskrift og bestem leddet foran x-værdien
         for (int i = 0; i < count; i++)
         {
+            string led = ""; // Angiver tallet foran den nuværende x-værdi
+            // Første led ( dvs. 32x^3)
             if (i == 0)
             {
-                string x = "";
-                for (int j = 0; j < order[i]; j++)
+                for (int j = 0; j < pos[i]; j++)
                 {
-                    x += function[j];
+                    led += function[j];
                 }
-                answer = (System.Int32.Parse(function[order[i] + 2].ToString()) * System.Int32.Parse(x)).ToString()
-                + "x^" + (System.Int32.Parse(function[order[i] + 2].ToString()) - 1) + function[order[i] + 3];
             }
-            else if (i == count - 1)
-            {
-                string x = "";
-                for (int j = 0; j < order[i] - (order[i - 1] + 3) - 1; j++)
-                {
-                    x += function[j];
-                }
-                answer += (System.Int32.Parse(function[order[i] + 2].ToString()) * System.Int32.Parse(x)).ToString()
-                + "x^" + (System.Int32.Parse(function[order[i] + 2].ToString()) - 1);
-            }
+            // alt andet
             else
             {
-                string x = "";
-                for (int j = order[i - 1]; j < order[i] - 4; j++)
+                // 4-tallet forklares bedst ved et eksempel
+                // Tag funktionen f(x)=3x^3+7x^2
+                // Ved i = 1 er man ved det 2. x med indeks pos[i], og i dette tilfælde indeks 6
+                // samtidig har man den tidligere x ved indeks pos[i - 1], og i dette tilfælde indeks 1
+                // Da der i funktionsudtrykket er afstanden 4 (man går gennem følgende ting: "^3+")
+                // inden man når leddet, så skal man bruge 4.
+                for (int j = pos[i - 1]; j < pos[i] - 4; j++)
                 {
-                    x += function[j + 4];
+                    led += function[j + 4];
                 }
-                answer += (System.Int32.Parse(function[order[i] + 2].ToString()) * System.Int32.Parse(x)).ToString()
-                + "x^" + (System.Int32.Parse(function[order[i] + 2].ToString()) - 1) + function[order[i] + 3];
+            }
+
+            // System.Int32.Parse()- og ToString()-funktionerne skal desværre benyttes, som det er ulogisk
+            // at konvertere fra int til string tilbage til int igen og igen, men det returnerer det rigtige svar
+            int gammelEksponent = System.Int32.Parse(function[pos[i] + 2].ToString());
+            int gammelLed = System.Int32.Parse(led);
+            int nyEksponent = System.Int32.Parse(function[pos[i] + 2].ToString()) - 1;
+
+            answer += (gammelEksponent * gammelLed).ToString() + "x^" + nyEksponent.ToString();
+
+            if (i != count - 1)
+            {
+                answer += function[pos[i] + 3];
             }
         }
         return answer;
