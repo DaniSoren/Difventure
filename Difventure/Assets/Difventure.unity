@@ -283,10 +283,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 993479545}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6dae20cade4ee244493cb5034519f8c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 2b9dfac8d12c08e41a86eea7908eaaaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  correctAnswers: 0
 --- !u!65 &993479547
 BoxCollider:
   m_ObjectHideFlags: 0

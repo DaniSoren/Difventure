@@ -1,35 +1,17 @@
 /// <summary>
-/// Assignment-klasse
 /// Denne klasse skal kunne lave og rette opgaver.
 /// Den skal samtidig styre progressionen og sværhedsgraden i opgaverne
 /// </summary>
 
-using UnityEngine; // TODO: Fjern denne og nedarvningen, når koden er done
+public class Assignment {
+    #region Variables
+    // Det korrekte svar til den nuværende opgave
+    private string correctAnswer;
 
-public class Assignment : MonoBehaviour {
-    // TODO: Slet region
-    #region SHIT
-    
-    // Constructor med en given sværhedsgrad til opgaverne
-    Assignment(Difficulty difficulty)
-    {
-        correctAnswers = 0;
-        correctAnswersInARow = 0;
-        diff = difficulty;
-    }
-
-    // Default constructor
-    Assignment()
-    {
-        correctAnswers = 0;
-        correctAnswersInARow = 0;
-        diff = Difficulty.INTRODUCTION;
-    }
-
-    // Angiver antal korrekte svar
+    // Angiver # af opgaver, brugeren har svaret rigtigt på
     public int correctAnswers;
 
-    // Angiver hvilken orden, som funktioner er, fx en 2. ordens ligning, dvs. en parabel
+    // Angiver hvilken orden, som polynomiet er, fx lineær/parabel
     private int orderOfFunc;
 
     // Angiver brugerens nuværende ekspertiseniveau
@@ -38,182 +20,36 @@ public class Assignment : MonoBehaviour {
     // Antal rigtige svar i streg
     private int correctAnswersInARow;
 
-    // Det korrekte svar til den nuværende opgave
-    private string correctAnswer;
+    // Antal forkerte svar i streg
+    private int wrongAnswersInARow;
 
-    private bool HasExtrema()
+    // Indekset af den uafhængige variabel i funktionsforskriften
+    private int[] posOfVar = new int[9];
+    #endregion
+    #region Constructors
+    // Constructor med en given sværhedsgrad til opgaverne
+    public Assignment(Difficulty difficulty)
     {
-        switch (orderOfFunc)
-        {
-            // Case 0 er en nultegradsligning, fx f(x)=5x^0=5, dvs. en ret linje uden hældning
-            case 0:
-                break;
-            // Case 1 er en 1. grads ligning, fx f(x)=3x^1-5x^0, dvs. en ret linje med en hældning
-            case 1:
-                break;
-            // Case 2 er en 2. grads ligning, fx f(x)=x^2-3x^1-5x^0, dvs. en parabel
-            case 2:
-                return true;
-            // Case 3 er en 3. grads ligning, fx f(x)=4x^3-x^2-3x^1-5x^0. Måske slet, fordi return type er en float...
-            case 3:
-                return true;
-        }
-        return false;
+        correctAnswer = "";
+        correctAnswers = 0;
+        orderOfFunc = 0;
+        correctAnswersInARow = 0;
+        wrongAnswersInARow = 0;
+        diff = difficulty;
     }
 
-    // Kan beregne ekstremumspunktet, dvs. top- eller minimumspunkt
-    // string function er den givne funktion
-    private float CalculateExtrema(string function, char axis)
+    // Default constructor
+    public Assignment()
     {
-        int[] pos = new int[9];
-        DetermineVarPos(function, ref pos);
-        string ledA = "";
-        string ledB = "";
-        string ledC = "";
-        string fortegnA = "";
-        string fortegnB = "";
-        string fortegnC = "";
-
-        if (HasExtrema())
-        {
-            // Starter med en 2. grads funktion
-            if (axis == 'x')
-            {
-                if (function[0] == '+' || function[0] == '-')
-                {
-                    fortegnA = function[0].ToString();
-                }
-                for (int i = 0; i < pos[0]; i++)
-                {
-                    ledA += function[i];
-                }
-                fortegnB = function[pos[0] + 3].ToString();
-                for (int i = pos[0]/*2*/; i < pos[1]/*8*/ - 4; i++)
-                {
-                    ledB += function[i + 4];
-                }
-                float a = System.Int32.Parse(fortegnA + ledA);
-                float b = System.Int32.Parse(fortegnB + ledB);
-                float res = (-b) / (2 * a);
-                return res;
-            }
-            else if (axis == 'y')
-            {
-                if (function[0] == '+' || function[0] == '-')
-                {
-                    fortegnA = function[0].ToString();
-                }
-                for (int i = 0; i < pos[0]; i++)
-                {
-                    ledA += function[i];
-                }
-                for (int i = pos[0]/*2*/; i < pos[1]/*8*/ - 4; i++)
-                {
-                    ledB += function[i + 4];
-                }
-                fortegnB = function[pos[0] + 3].ToString();
-                for (int i = pos[1]/*2*/; i < pos[2]/*8*/ - 4; i++)
-                {
-                    ledC += function[i + 4];
-                }
-                fortegnC = function[pos[1] + 3].ToString();
-                float a = System.Int32.Parse(fortegnA + ledA);
-                float b = System.Int32.Parse(fortegnB + ledB);
-                float c = System.Int32.Parse(fortegnC + ledC);
-                float disk = -(b * b - 4 * a * c);
-                float res = disk / (4 * a);
-                return res;
-            }
-        }
-        return -1.0003f;
+        correctAnswer = "";
+        correctAnswers = 0;
+        orderOfFunc = 0;
+        correctAnswersInARow = 0;
+        wrongAnswersInARow = 0;
+        diff = Difficulty.INTRODUCTION;
     }
-
-    // Funktion, der kan opstille de forudinstillede opgaver, som brugeren
-    // vil møde i repetitionsniveauet i spillet, dvs. det er undervisnings-
-    // forløbet
-    public void Introduction()
-    {
-
-        int tasksComplete = 0;
-        string task = "";
-        switch (tasksComplete)
-        {
-            case 0:
-                correctAnswer = Differentiate(task);
-                Correct("User input");
-                break;
-            case 1:
-                correctAnswer = Differentiate("5x^0");
-                Correct("User input");
-                break;
-            case 2:
-                break;
-            case 3:
-                correctAnswer = Differentiate("2x^1+3x^0");
-                Correct("User input");
-                break;
-            case 4:
-                correctAnswer = Differentiate("x^2+3x^1-4x^0");
-                Correct("User input");
-                break;
-            case 5:
-                break;
-            case 6:
-                break;
-            case 7:
-                break;
-            case 8:
-                break;
-            case 9:
-                break;
-            case 10:
-                break;
-            case 11:
-                break;
-            case 12:
-                break;
-            case 13:
-                break;
-            case 14:
-                break;
-        }
-    }
-
-    // Kan generere opgaver til brugeren, og opgaverne kan stige/falde i sværhedsgrad afhængig
-    // af brugerens ekspertise
-    public void Create()
-    {
-        switch(diff)
-        {
-            case Difficulty.INTRODUCTION:
-                Introduction();
-                break;
-            case Difficulty.EASY:
-                break;
-            case Difficulty.MEDIUM:
-                break;
-            case Difficulty.HARD:
-                break;
-            case Difficulty.INSANE:
-                break;
-        }
-    }
-
-    // Retter brugerens opgave og kan ændre i visse parametre, som kan ændre
-    // i sværhedsgraden i opgaverne
-    public void Correct(string function)
-    {
-        if (IsUserCorrect(function))
-        {
-            correctAnswers++;
-            correctAnswersInARow++;
-        }
-        else
-        {
-            correctAnswersInARow = 0;
-        }
-    }
-
+    #endregion
+    #region Generate functions
     // Angiver forskellige sværhedsgrader i opgaverne
     public enum Difficulty
     {
@@ -224,18 +60,154 @@ public class Assignment : MonoBehaviour {
         INSANE
     };
 
+    // Gør funktionen mere læsevenlig for brugeren ved at
+    // fjerne irrelevant information i funktionsudtrykket
+    private string CleanGenerated(string function)
+    {
+        function = function.Replace("x^1", "x");
+        function = function.Replace("x^0", "");
+        return function;
+    }
+
+    // Kan generere et polynomie
+    // int lengthOfPolyonimal angiver hvilken orden, polynomiet er
+    private string Generate(int lengthOfPolynomial)
+    {
+        string task = ""; // Nuværende opgave
+        System.Random rand = new System.Random(); // Random Number Generator
+        for (int i = 0; i <= lengthOfPolynomial; i++)
+        {
+            // Sæt fortegn på første led
+            if (i == 0 && rand.Next(2) == 1)
+                task += "-";
+
+            // Genererer tallet foran variablen
+            if (diff == Difficulty.INSANE || diff == Difficulty.HARD)
+                task += rand.Next(1, 15);
+            else
+                task += rand.Next(1, 5);
+
+            // Genererer den uafhængige variabel og eksponenten
+            task += "x^" + (lengthOfPolynomial - i);
+
+            // Sæt '+' eller '-' ind i funktionsforskriften
+            if (i != lengthOfPolynomial)
+            {
+                if (rand.Next(2) == 1)
+                    task += "+";
+                else
+                    task += "-";
+            }
+        }
+        return task;
+    }
+
+    // Kan lave opgaver til brugeren. Opgaverne afhænger af
+    // brugerens ekspertiseniveau
+    public string Create()
+    {
+        // Ændrer sværhedsgraden i opgaverne
+        if (correctAnswersInARow == 3)
+            LowerDifficulty(false);
+        if (wrongAnswersInARow == 3)
+            LowerDifficulty(true);
+
+        string task = ""; // Opgaven, som brugeren ser
+        string function = ""; // Den genererede funktion
+        System.Random rand = new System.Random(); // Random Number Generator
+
+        // Afhængig af den nuværende sværhedsgrad, så generer en relevant opgave
+        switch (diff)
+        {
+            case Difficulty.INTRODUCTION:
+                task = Introduction();
+                break;
+
+            case Difficulty.EASY:
+                function = Generate(2);
+                correctAnswer = CleanGenerated(Differentiate(function));
+                task = "Du bedes aflede funktionen: " + function;
+                break;
+
+            case Difficulty.MEDIUM:
+                function = Generate(3);
+                correctAnswer = CleanGenerated(Differentiate(function));
+                task = "Du bedes aflede funktionen: " + function;
+                break;
+
+            case Difficulty.HARD:
+                if (rand.Next(2) == 1)
+                {
+                    function = Generate(3);
+                    correctAnswer = CleanGenerated(Differentiate(function));
+                    task = "Du bedes aflede funktionen: " + function;
+                }
+                else
+                {
+                    function = Generate(2);
+                    correctAnswer = "X: " + CalculateExtrema(function, 'x')
+                                 + " Y: " + CalculateExtrema(function, 'y');
+                    task = "Du bedes finde ekstremumspunkt på funktionen: " + function;
+                }
+                break;
+
+            case Difficulty.INSANE:
+                if (rand.Next(2) == 1)
+                {
+                    function = Generate(4);
+                    correctAnswer = CleanGenerated(Differentiate(function));
+                    task = "Du bedes aflede funktionen: " + function;
+                }
+                else
+                {
+                    function = Generate(2);
+                    correctAnswer = "X: " + CalculateExtrema(function, 'x')
+                                 + " Y: " + CalculateExtrema(function, 'y');
+                    task = "Du bedes finde ekstremumspunkt på funktionen: " + function;
+                }
+                break;
+        }
+        return CleanGenerated(task);
+    }
+
+    // Funktion, der kan opstille de forudinstillede opgaver, som brugeren
+    // vil møde i repetitionsniveauet i spillet, dvs. det er undervisningsforløbet
+    private string Introduction()
+    {
+        string task = ""; // Nuværende opgave
+        string function = ""; // Funktionen, der arbejdes med
+
+        // Giv brugeren en fast opgave afhængig af, hvor
+        // langt brugeren er nået i uddannelsesforløbet
+        switch (correctAnswers)
+        {
+            case 0:
+                function = "3x^1+4x^0";
+                correctAnswer = CleanGenerated(Differentiate(function));
+                task = "Du bedes aflede funktionen: " + function;
+                break;
+            case 1:
+                function = "8x^1-2x^0";
+                correctAnswer = CleanGenerated(Differentiate(function));
+                task = "Du bedes aflede funktionen: " + function;
+                break;
+            case 2:
+                function = "5x^2+3x^1-4x^0";
+                correctAnswer = CleanGenerated(Differentiate(function));
+                task = "Du bedes aflede funktionen: " + function;
+                break;
+        }
+        return task;
+    }
+
     // Kan hæve/sænke opgavernes sværhedsgrad
     // bool lowerDifficulty angiver, hvor vidt sværhedsgraden skal hæves eller sænkes
-    private void ChangeDifficulty(bool lowerDifficulty)
+    private void LowerDifficulty(bool lowerDifficulty)
     {
-        if(lowerDifficulty)
-        {
+        if (lowerDifficulty)
             DecreaseDifficulty(diff);
-        }
         else
-        {
             IncreaseDifficulty(diff);
-        }
     }
 
     // Hæver sværhedsgraden af opgaverne
@@ -283,129 +255,194 @@ public class Assignment : MonoBehaviour {
                 break;
         }
     }
+    #endregion
+    #region Analyze functions
+    // Angiver, om polynomiet har et ekstremumspunkt
+    private bool HasExtrema()
+    {
+        // Funktionen har et toppunkt, hvis det er en 2. ordens
+        // funktion, dvs. en parabel. Ellers regnes der ikke på det
+        if (orderOfFunc == 2)
+            return true;
+        else
+            return false;
+    }
+
+    // Kan beregne ekstremumspunktet, dvs. top- eller minimumspunkt
+    // string function er den givne funktion
+    // char axis er hvilken akse, der beregnes toppunkt ved, enten 'x' eller 'y'.
+    private string CalculateExtrema(string function, char axis)
+    {
+        // Leder efter indeks, hvor funktionforskriften har 
+        // variablen 'x' i sig
+        SearchForChar(function, 'x');
+
+        // Tjekker om funktionen overhovedet har et toppunkt
+        if (HasExtrema())
+        {
+            // a, b, c er led i 2. grads polynomiet
+            // Konverterer fra int til float for at få decimaltal med
+            float a = System.Convert.ToSingle(GetConstantOfFunction(function, 'a'));
+            float b = System.Convert.ToSingle(GetConstantOfFunction(function, 'b'));
+            if (axis == 'x')
+            {
+                // Formel: x = (-b) / (2 * a)
+                float res = (-b) / (2 * a);
+                // Konverterer til string for at evt. afkorte x-koordinatet
+                return res.ToString("0.#");
+            }
+            else if (axis == 'y')
+            {
+                // Formel: y = -(b * b - 4 * a * c) / (4 * a)
+                float c = System.Convert.ToSingle(GetConstantOfFunction(function, 'c'));
+                float res = -(b * b - 4 * a * c) / (4 * a);
+                // Konverterer til string for at evt. afkorte x-koordinatet
+                return res.ToString("0.#");
+            }
+        }
+        return "";
+    }
+
+    // Retter brugerens opgave og tilpasser parametre, som justerer
+    // på sværhedsgraden i opgaverne.
+    public string Correct(string function)
+    {
+        if (IsUserCorrect(function))
+        {
+            correctAnswers++;
+            correctAnswersInARow++;
+            return "Rigtigt svar. Godt gået kammerat!";
+        }
+        else
+        {
+            correctAnswersInARow = 0;
+            wrongAnswersInARow++;
+            return "Det er desværre forkert. Det rigtige svar er: " + correctAnswer + ".";
+        }
+    }
 
     // Tjekker, om brugerens svar er korrekt
     // string function er brugerens svar
     private bool IsUserCorrect(string function) { return function == correctAnswer; }
 
-    // Bestemmer de indeks, som indeholder 'x' i en tekststreng og gemmer det i et array
-    // string function er den givne tekststreng / funktion
-    // ref int[] pos er array, og det er givet som reference, dvs. man ændrer i den værdi, man giver ind i funktionen
-    // ref int count er antallet af gange, 'x' blev fundet i tekststrengen
-    private void DetermineVarPos(string function, ref int[] pos, ref int count)
+    // Bestemmer indekset i funktionsforskriften, hvor den uafhængige variabel indtræder
+    // string function er den givne funktionsforskrift
+    // char var er den uafhængige variabel
+    private void SearchForChar(string function, char var)
     {
-        // Gør, så array har størrelse på 9 ints
-        pos = new int[9];
-        orderOfFunc = -1;
+        // Først ryddes variablen posOfVar's indeks i memory
+        System.Array.Clear(posOfVar, 0, posOfVar.Length);
 
-        // Søg efter bogstavet 'x' i funktionsforskriften og gem i pos-array
-        for (int i = 0; i < function.Length; i++)
-        {
-            if (function[i] == 'x')
-            {
-                pos[count] = i;
-                count++;
-            }
-        }
-        // Sætter klassevariablen orderOfFunc lig antallet af x'er fundet.
-        // Det gør, at man igennem hele klassen kan se, hvilken orden, funktionen er i
-        // TODO: Er det her nødvendigt?
-        orderOfFunc = count;
-    }
-
-    // Bestemmer de indeks, som indeholder 'x' i en tekststreng og gemmer det i et array
-    // string function er den givne tekststreng / funktion
-    // ref int[] pos er array, og det er givet som reference, dvs. man ændrer i den værdi, man giver ind i funktionen
-    // ref int count er antallet af gange, 'x' blev fundet i tekststrengen
-    private void DetermineVarPos(string function, ref int[] pos)
-    {
-        // Gør, så array har størrelse på 9 ints
-        pos = new int[9];
+        // Angiver antal gange, man har fundet den uafhængige variabel
         int count = 0;
 
-        // Søg efter bogstavet 'x' i funktionsforskriften og gem i pos-array
+        // Søg efter bogstavet 'x' i funktionsforskriften og gem i posOfVar-array
         for (int i = 0; i < function.Length; i++)
         {
-            if (function[i] == 'x')
+            if (function[i] == var)
             {
-                pos[count] = i;
+                posOfVar[count] = i;
                 count++;
             }
         }
+        // Sætter klassevariablen orderOfFunc lig antallet gange, variablen blev fundet
+        orderOfFunc = count - 1;
     }
-    #endregion
 
-    // Differentierer en given funktion af brugeren.
-    // Virker kun på polynomier
+    // Kan trække leddene ud af et givent funktionsudtryk
+    // string function er funktionsudtrykket
+    // char constant er leddet, der skal hives ud, fx 'a', 'b', eller 'c'
+    int GetConstantOfFunction(string function, char constant)
+    {
+        // Gør noget forskelligt af, hvilket led, man leder efter
+        switch (constant)
+        {
+            case 'a':
+                // Fortegnet i funktionsudtrykket
+                string sign = "";
+                // a-leddet i funktionsudtrkkey
+                string constantA = "";
+
+                // Tjekker om fortegnet er et '-'
+                if(function[0] == '-')
+                {
+                    sign = function[0].ToString();
+                    // Loop igennem leddet og læg det oven i a-leddet
+                    for (int i = 1; i < posOfVar[0]; i++)
+                        constantA += function[i];
+                }
+                else
+                {
+                    // Loop igennem leddet og læg det oven i a-leddet
+                    for (int i = 0; i < posOfVar[0]; i++)
+                        constantA += function[i];
+                }
+                return int.Parse(sign + constantA);
+            case 'b':
+                // b- og c-leddene findes på en lidt nemmere måde
+                return ReturnConstant(function, 1);
+            case 'c':
+                return ReturnConstant(function, 2);
+        }
+        return -10300;
+    }
+
+    // Kan returnere 'b'- og 'c'-leddene i funktionsudtrykket
+    // string function angiver funktionsudtrykket
+    // int j angiver positionen, som leddet har i funktionsudtrykket
+    int ReturnConstant(string function, int j)
+    {
+        // Fortegnet i funktionsudtrykket
+        string sign = function[posOfVar[j - 1] + 3].ToString();
+        // Leddet, man søger
+        string constant = "";
+
+        // Loop igennem og læg tallene fundet til leddet
+        for (int i = posOfVar[j - 1]; i < posOfVar[j] - 4; i++)
+            constant += function[i + 4];
+
+        return int.Parse(sign + constant);
+    }
+
+    // Differentierer en given funktion af brugeren. Virker kun på polynomier
     // string function er den givne funktion, der skal differentieres
     private string Differentiate(string function)
     {
-        int[] pos = new int[9];
-        int count = 0;
-
-        DetermineVarPos(function, ref pos, ref count);
-
+        // Bestem indekset af, hvor den uafhængige variabel er i funktionen
+        SearchForChar(function, 'x');
+        // Den afledte funktion
         string answer = "";
-
-        // Loop igennem alle de fundne 'x'-er fundet i funktionsforskrift og bestem leddet foran x-værdien
-        for (int i = 0; i < count; i++)
+        // Loop igennem funktionens orden led for led
+        for (int i = 0; i < orderOfFunc; i++)
         {
-            string led = ""; // Angiver tallet foran den nuværende x-værdi
-            // Første led ( dvs. 32x^3)
+            // Det nuværende led
+            string led = "";
+
+            // Bestem det nuværende led
             if (i == 0)
-            {
-                for (int j = 0; j < pos[i]; j++)
-                {
-                    led += function[j];
-                }
-            }
-            // alt andet
+                led = GetConstantOfFunction(function, 'a').ToString();
             else
             {
-                // 4-tallet forklares bedst ved et eksempel
-                // Tag funktionen f(x)=3x^3+7x^2
-                // Ved i = 1 er man ved det 2. x med indeks pos[i], og i dette tilfælde indeks 6
-                // samtidig har man den tidligere x ved indeks pos[i - 1], og i dette tilfælde indeks 1
-                // Da der i funktionsudtrykket er afstanden 4 (man går gennem følgende ting: "^3+")
-                // inden man når leddet, så skal man bruge 4.
-                for (int j = pos[i - 1]; j < pos[i] - 4; j++)
-                {
+                for (int j = posOfVar[i - 1]; j < posOfVar[i] - 4; j++)
                     led += function[j + 4];
-                }
             }
 
-            // System.Int32.Parse()- og ToString()-funktionerne skal desværre benyttes, som det er ulogisk
-            // at konvertere fra int til string tilbage til int igen og igen, men det returnerer det rigtige svar
-            int gammelEksponent = System.Int32.Parse(function[pos[i] + 2].ToString());
-            int gammelLed = System.Int32.Parse(led);
-            int nyEksponent = System.Int32.Parse(function[pos[i] + 2].ToString()) - 1;
+            // Formel: f(x)=a*x^n => f'(x)=n*a*x^(n-1)
+            // Bestem 'n' i formlen
+            int gammelEksponent = int.Parse(function[posOfVar[i] + 2].ToString());
+            // Bestem 'a' i formlen
+            int gammelLed = int.Parse(led);
+            // bestem 'n - 1' i formlen
+            int nyEksponent = gammelEksponent - 1;
 
+            // Benyt formlen
             answer += (gammelEksponent * gammelLed).ToString() + "x^" + nyEksponent.ToString();
 
-            // Så længe man ikke er ved slutiterationen, så skal man sætte '+'
-            // eller '-' i sit nye funktionsudtryk
-            if (i != count - 1)
-            {
-                // Sepererer leddene i funktionsudtrykket, dvs man sætter enten '+' eller '-'
-                answer += function[pos[i] + 3];
-            }
+            // Sæt '+' eller '-' i funktionsforskrift
+            if (i != orderOfFunc - 1)
+                answer += function[posOfVar[i] + 3];
         }
         return answer;
     }
-
-    // TODO: Slet
-    private void Start()
-    {
-        string TredjeGradsLigning = "32x^3+22x^2-11x^1+90x^0";
-        string andenGradsLigning = "5x^2+3x^1-3x^0";
-        Differentiate(andenGradsLigning);
-
-        Debug.Log("Original ligning: " + andenGradsLigning);
-
-        Debug.Log("X: " + CalculateExtrema(andenGradsLigning, 'x'));
-
-        Debug.Log("Y: " + CalculateExtrema(andenGradsLigning, 'y'));
-
-        Debug.Log("Differentieret ligning: " + Differentiate(andenGradsLigning));
-    }
-}
+    #endregion
+} // Slutningen af Assignment-klassen
