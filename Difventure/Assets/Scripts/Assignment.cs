@@ -9,7 +9,10 @@ public class Assignment {
     private string correctAnswer;
 
     // Angiver # af opgaver, brugeren har svaret rigtigt på
-    public int correctAnswers;
+    private int correctAnswers;
+
+    // Kan returnere # af opgaver, brugeren har svaret rigtigt på
+    public int GetCorrectAnswers() { return correctAnswers; }
 
     // Angiver hvilken orden, som polynomiet er, fx lineær/parabel
     private int orderOfFunc;
@@ -23,33 +26,9 @@ public class Assignment {
     // Antal forkerte svar i streg
     private int wrongAnswersInARow;
 
-    // Indekset af den uafhængige variabel i funktionsforskriften
+    // Indeks af den uafhængige variabel i funktionsforskriften
     private int[] posOfVar = new int[9];
-    #endregion
-    #region Constructors
-    // Constructor med en given sværhedsgrad til opgaverne
-    public Assignment(Difficulty difficulty)
-    {
-        correctAnswer = "";
-        correctAnswers = 0;
-        orderOfFunc = 0;
-        correctAnswersInARow = 0;
-        wrongAnswersInARow = 0;
-        diff = difficulty;
-    }
 
-    // Default constructor
-    public Assignment()
-    {
-        correctAnswer = "";
-        correctAnswers = 0;
-        orderOfFunc = 0;
-        correctAnswersInARow = 0;
-        wrongAnswersInARow = 0;
-        diff = Difficulty.INTRODUCTION;
-    }
-    #endregion
-    #region Generate functions
     // Angiver forskellige sværhedsgrader i opgaverne
     public enum Difficulty
     {
@@ -59,7 +38,33 @@ public class Assignment {
         HARD,
         INSANE
     };
+    #endregion
+    #region Constructors
+    // Nulstiller klassevariablene
+    private void Initialize()
+    {
+        correctAnswer = "";
+        correctAnswers = 0;
+        orderOfFunc = 0;
+        correctAnswersInARow = 0;
+        wrongAnswersInARow = 0;
+    }
 
+    // Constructor med en given sværhedsgrad til opgaverne
+    public Assignment(Difficulty difficulty)
+    {
+        Initialize();
+        diff = difficulty;
+    }
+
+    // Default constructor
+    public Assignment()
+    {
+        Initialize();
+        diff = Difficulty.INTRODUCTION;
+    }
+    #endregion
+    #region Generate functions
     // Gør funktionen mere læsevenlig for brugeren ved at
     // fjerne irrelevant information i funktionsudtrykket
     private string CleanGenerated(string function)
@@ -107,12 +112,12 @@ public class Assignment {
     public string Create()
     {
         // Ændrer sværhedsgraden i opgaverne
-        if (correctAnswersInARow == 3)
+        if (correctAnswersInARow > 3)
             LowerDifficulty(false);
-        if (wrongAnswersInARow == 3)
+        if (wrongAnswersInARow > 3)
             LowerDifficulty(true);
 
-        string task = ""; // Opgaven, som brugeren ser
+        string task = ""; // Opgaven, som brugeren får
         string function = ""; // Den genererede funktion
         System.Random rand = new System.Random(); // Random Number Generator
 
@@ -125,29 +130,24 @@ public class Assignment {
 
             case Difficulty.EASY:
                 function = Generate(2);
-                correctAnswer = CleanGenerated(Differentiate(function));
-                task = "Du bedes aflede funktionen: " + function;
+                task = DifferentiateAssignment(function);
                 break;
 
             case Difficulty.MEDIUM:
                 function = Generate(3);
-                correctAnswer = CleanGenerated(Differentiate(function));
-                task = "Du bedes aflede funktionen: " + function;
+                task = DifferentiateAssignment(function);
                 break;
 
             case Difficulty.HARD:
                 if (rand.Next(2) == 1)
                 {
                     function = Generate(3);
-                    correctAnswer = CleanGenerated(Differentiate(function));
-                    task = "Du bedes aflede funktionen: " + function;
+                    task = DifferentiateAssignment(function);
                 }
                 else
                 {
                     function = Generate(2);
-                    correctAnswer = "X: " + CalculateExtrema(function, 'x')
-                                 + " Y: " + CalculateExtrema(function, 'y');
-                    task = "Du bedes finde ekstremumspunkt på funktionen: " + function;
+                    task = FindExtremaAssignment(function);
                 }
                 break;
 
@@ -155,19 +155,35 @@ public class Assignment {
                 if (rand.Next(2) == 1)
                 {
                     function = Generate(4);
-                    correctAnswer = CleanGenerated(Differentiate(function));
-                    task = "Du bedes aflede funktionen: " + function;
+                    task = DifferentiateAssignment(function);
                 }
                 else
                 {
                     function = Generate(2);
-                    correctAnswer = "X: " + CalculateExtrema(function, 'x')
-                                 + " Y: " + CalculateExtrema(function, 'y');
-                    task = "Du bedes finde ekstremumspunkt på funktionen: " + function;
+                    task = FindExtremaAssignment(function);
                 }
                 break;
         }
         return CleanGenerated(task);
+    }
+
+    // Sætter correctAnswer klassevariabel til det rigtige og returnerer
+    // en tekststreng, som kan give opgaven til brugeren
+    // string function er funktionsforskriften
+    private string DifferentiateAssignment(string function)
+    {
+        correctAnswer = CleanGenerated(Differentiate(function));
+        return "Du bedes aflede funktionen: " + function;
+    }
+
+    // Sætter correctAnswer klassevariabel til det rigtige og returnerer
+    // en tekststreng, som kan give opgaven til brugeren
+    // string function er funktionsforskriften
+    private string FindExtremaAssignment(string function)
+    {
+        correctAnswer = "X: " + CalculateExtrema(function, 'x')
+                     + " Y: " + CalculateExtrema(function, 'y');
+        return "Du bedes finde ekstremumspunkt på funktionen: " + function;
     }
 
     // Funktion, der kan opstille de forudinstillede opgaver, som brugeren
@@ -183,19 +199,17 @@ public class Assignment {
         {
             case 0:
                 function = "3x^1+4x^0";
-                correctAnswer = CleanGenerated(Differentiate(function));
-                task = "Du bedes aflede funktionen: " + function;
+                task = DifferentiateAssignment(function);
                 break;
             case 1:
                 function = "8x^1-2x^0";
-                correctAnswer = CleanGenerated(Differentiate(function));
-                task = "Du bedes aflede funktionen: " + function;
+                task = DifferentiateAssignment(function);
                 break;
             case 2:
                 function = "5x^2+3x^1-4x^0";
-                correctAnswer = CleanGenerated(Differentiate(function));
-                task = "Du bedes aflede funktionen: " + function;
+                task = DifferentiateAssignment(function);
                 break;
+                // TO BE CONTINUED
         }
         return task;
     }
@@ -261,8 +275,8 @@ public class Assignment {
     private bool HasExtrema()
     {
         // Funktionen har et toppunkt, hvis det er en 2. ordens
-        // funktion, dvs. en parabel. Ellers regnes der ikke på det
-        if (orderOfFunc == 2)
+        // funktion, dvs. en parabel eller større orden
+        if (orderOfFunc >= 2)
             return true;
         else
             return false;
@@ -293,7 +307,7 @@ public class Assignment {
             }
             else if (axis == 'y')
             {
-                // Formel: y = -(b * b - 4 * a * c) / (4 * a)
+                // Formel: y = -(b ^ 2 - 4 * a * c) / (4 * a)
                 float c = System.Convert.ToSingle(GetConstantOfFunction(function, 'c'));
                 float res = -(b * b - 4 * a * c) / (4 * a);
                 // Konverterer til string for at evt. afkorte x-koordinatet
@@ -311,6 +325,7 @@ public class Assignment {
         {
             correctAnswers++;
             correctAnswersInARow++;
+            wrongAnswersInARow = 0;
             return "Rigtigt svar. Godt gået kammerat!";
         }
         else
@@ -330,7 +345,7 @@ public class Assignment {
     // char var er den uafhængige variabel
     private void SearchForChar(string function, char var)
     {
-        // Først ryddes variablen posOfVar's indeks i memory
+        // Først ryddes klassevariablen posOfVar's indekser i memory
         System.Array.Clear(posOfVar, 0, posOfVar.Length);
 
         // Angiver antal gange, man har fundet den uafhængige variabel
@@ -352,7 +367,7 @@ public class Assignment {
     // Kan trække leddene ud af et givent funktionsudtryk
     // string function er funktionsudtrykket
     // char constant er leddet, der skal hives ud, fx 'a', 'b', eller 'c'
-    int GetConstantOfFunction(string function, char constant)
+    private int GetConstantOfFunction(string function, char constant)
     {
         // Gør noget forskelligt af, hvilket led, man leder efter
         switch (constant)
@@ -390,7 +405,7 @@ public class Assignment {
     // Kan returnere 'b'- og 'c'-leddene i funktionsudtrykket
     // string function angiver funktionsudtrykket
     // int j angiver positionen, som leddet har i funktionsudtrykket
-    int ReturnConstant(string function, int j)
+    private int ReturnConstant(string function, int j)
     {
         // Fortegnet i funktionsudtrykket
         string sign = function[posOfVar[j - 1] + 3].ToString();
@@ -422,10 +437,7 @@ public class Assignment {
             if (i == 0)
                 led = GetConstantOfFunction(function, 'a').ToString();
             else
-            {
-                for (int j = posOfVar[i - 1]; j < posOfVar[i] - 4; j++)
-                    led += function[j + 4];
-            }
+                led = ReturnConstant(function, i).ToString();
 
             // Formel: f(x)=a*x^n => f'(x)=n*a*x^(n-1)
             // Bestem 'n' i formlen
@@ -439,7 +451,7 @@ public class Assignment {
             answer += (gammelEksponent * gammelLed).ToString() + "x^" + nyEksponent.ToString();
 
             // Sæt '+' eller '-' i funktionsforskrift
-            if (i != orderOfFunc - 1)
+            if (i != orderOfFunc - 1 && function[posOfVar[i] + 3] != '-')
                 answer += function[posOfVar[i] + 3];
         }
         return answer;
