@@ -9,6 +9,7 @@ public class movement : MonoBehaviour
   
     public float speed = 6f;
     public float pickups;
+    public float camerapos = 0;
     // Use this for initialization
     void Start ()
     {
@@ -30,8 +31,24 @@ public class movement : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Pick Up"))
         {
+            //SceneManager.LoadSceneAsync("Opgave");
             other.gameObject.SetActive(false);
             pickups++;
+        }
+        if (other.gameObject.CompareTag("Camera change"))
+        {
+            if(camerapos==0)
+            {
+                camerapos = 1;
+            }
+            else
+            {
+                camerapos = 0;
+            }
+        }
+        if(other.gameObject.CompareTag("NPC"))
+        {
+            SceneManager.LoadSceneAsync("MacDonalskopi");
         }
     }
 }
