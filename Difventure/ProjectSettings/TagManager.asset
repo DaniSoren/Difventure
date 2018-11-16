@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Pick Up
+  - Camera change
+  - NPC
+  - Text 1
   layers:
   - Default
   - TransparentFX
