@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MacDonalskopi.unity
     guid: 463cfdf3807c586429adc14e39da617d
+  - enabled: 1
+    path: "Assets/Scenes/L\xF8sOpgave.unity"
+    guid: 8e4e869c60bdc814caabd552a489ffa0
   m_configObjects: {}
