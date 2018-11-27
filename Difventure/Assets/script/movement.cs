@@ -23,7 +23,10 @@ public class movement : MonoBehaviour
         float moveVertical = Input.GetAxis("Vertical");
 
         Vector3 movement = new Vector3(-moveHorizontal*Time.deltaTime, 0.0f, -moveVertical*Time.deltaTime);
-      
+        if (pickups>=1)
+        {
+            GameObject.FindGameObjectWithTag("Pick Up").SetActive(false);
+        }
 
         transform.Translate(movement*speed);
     }
@@ -31,9 +34,7 @@ public class movement : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Pick Up"))
         {
-            //SceneManager.LoadSceneAsync("Opgave");
-            other.gameObject.SetActive(false);
-            pickups++;
+            SceneManager.LoadSceneAsync("LøsOpgave");
         }
         if (other.gameObject.CompareTag("Camera change"))
         {
